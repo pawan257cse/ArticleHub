@@ -1,33 +1,32 @@
-import axios from "axios";
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const connectDB = require("./config/db");
+const path = require("path");
 
-const api = axios.create({
-  baseURL: "https://articlehub-acmt.onrender.com/api"
+const app = express();
+connectDB();
+
+app.use(cors());
+app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/posts", require("./routes/postRoutes"));
+app.use("/api/comments", require("./routes/commentRoutes"));
+
+const clientPath = path.join(__dirname, "../client/dist");
+
+if (require("fs").existsSync(clientPath)) {
+  app.use(express.static(clientPath));
+
+  app.get("/*splat", (req, res) => {
+    res.sendFile(path.join(clientPath, "index.html"));
+  });
+}
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
-
-api.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return req;
-});
-
-api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (
-      err.response?.status === 401 &&
-      !err.config?.url?.includes("/auth/login")
-    ) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
-    }
-
-    return Promise.reject(err);
-  }
-);
-
-export default api;

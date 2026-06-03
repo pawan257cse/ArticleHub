@@ -49,6 +49,7 @@ export default function Register() {
       alert("Registration successful");
       navigate("/login");
     } catch (err) {
+      console.error("Register failed:", err);
       setErrors({ submit: err.response?.data?.message || "Registration failed" });
     } finally {
       setLoading(false);

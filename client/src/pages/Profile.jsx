@@ -11,7 +11,7 @@ export default function Profile() {
   const isOwnProfile = user && user.id === userId;
 
   useEffect(() => {
-    const endpoint = isOwnProfile ? "/posts/my" : `/posts/user/${userId}`;
+    const endpoint = isOwnProfile ? "/api/posts/my" : `/api/posts/user/${userId}`;
     api.get(endpoint)
       .then((res) => {
         setPosts(Array.isArray(res.data) ? res.data : []);
@@ -23,10 +23,14 @@ export default function Profile() {
   }, [userId, isOwnProfile]);
 
   const publishPost = async (id) => {
-    await api.patch(`/posts/${id}/status`);
-    setPosts(posts.map((p) =>
-      p._id === id ? { ...p, status: "published" } : p
-    ));
+    try {
+      await api.patch(`/api/posts/${id}/status`);
+      setPosts(posts.map((p) =>
+        p._id === id ? { ...p, status: "published" } : p
+      ));
+    } catch (err) {
+      console.error("Publish post failed:", err);
+    }
   };
 
   return (

@@ -27,7 +27,7 @@ export default function EditPost() {
   };
 
   useEffect(() => {
-    api.get(`/posts/${id}`)
+    api.get(`/api/posts/${id}`)
       .then(res => {
         if (!res.data) return;
         setTitle(res.data.title || "");
@@ -60,7 +60,7 @@ export default function EditPost() {
     if (image) formData.append("image", image);
 
     try {
-      await api.put(`/posts/${id}`, formData);
+      await api.put(`/api/posts/${id}`, formData);
       navigate(`/post/${id}`);
     } catch (error) {
       console.error("Update post failed:", error);

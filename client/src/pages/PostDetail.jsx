@@ -10,12 +10,20 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
 
   useEffect(() => {
-    api.get(`/posts/${id}`).then(res => setPost(res.data));
+    api.get(`/api/posts/${id}`)
+      .then(res => setPost(res.data))
+      .catch(err => {
+        console.error("Fetch post detail failed:", err);
+      });
   }, [id]);
 
   const toggleLike = async () => {
-    const res = await api.post(`/posts/${id}/like`);
-    setPost({ ...post, likes: Array(res.data.likesCount).fill(1) });
+    try {
+      const res = await api.post(`/api/posts/${id}/like`);
+      setPost({ ...post, likes: Array(res.data.likesCount).fill(1) });
+    } catch (err) {
+      console.error("Toggle like failed:", err);
+    }
   };
 
   if (!post) {

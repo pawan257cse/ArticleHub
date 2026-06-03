@@ -26,7 +26,7 @@ export default function CreatePost() {
     if (image) formData.append("image", image);
 
     try {
-      await api.post("/posts", formData);
+      await api.post("/api/posts", formData);
       alert("Post saved as draft");
       if (user) {
         navigate(`/profile/${user.id}`);

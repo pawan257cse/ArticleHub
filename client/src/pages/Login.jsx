@@ -28,6 +28,7 @@ export default function Login() {
       login(res.data);
       navigate("/");
     } catch (err) {
+      console.error("Login failed:", err);
       setError(
         err.response?.data?.message || "Invalid email or password"
       );

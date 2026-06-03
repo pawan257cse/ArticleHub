@@ -12,7 +12,7 @@ export default function Home() {
 
     setLoading(true);
     try {
-      const res = await api.get(`/posts/search?q=${query}`);
+      const res = await api.get(`/api/posts/search?q=${query}`);
       setPosts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Search failed:", err);
@@ -22,7 +22,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    api.get("/posts")
+    api.get("/api/posts")
       .then((res) => {
         setPosts(Array.isArray(res.data) ? res.data : []);
       })

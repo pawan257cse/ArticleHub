@@ -10,7 +10,7 @@ export default function CommentSection({ postId }) {
 
   // Fetch comments
   useEffect(() => {
-    api.get(`/comments/${postId}`)
+    api.get(`/api/comments/${postId}`)
       .then(res => {
         setComments(Array.isArray(res.data) ? res.data : []);
       })
@@ -25,19 +25,28 @@ export default function CommentSection({ postId }) {
     if (!text.trim()) return;
 
     setLoading(true);
-    const res = await api.post(`/comments/${postId}`, {
-      content: text
-    });
+    try {
+      const res = await api.post(`/api/comments/${postId}`, {
+        content: text
+      });
 
-    setComments([...comments, res.data]);
-    setText("");
-    setLoading(false);
+      setComments([...comments, res.data]);
+      setText("");
+    } catch (err) {
+      console.error("Add comment failed:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Delete comment
   const deleteComment = async (id) => {
-    await api.delete(`/comments/${id}`);
-    setComments(comments.filter(c => c._id !== id));
+    try {
+      await api.delete(`/api/comments/${id}`);
+      setComments(comments.filter(c => c._id !== id));
+    } catch (err) {
+      console.error("Delete comment failed:", err);
+    }
   };
 
   return (

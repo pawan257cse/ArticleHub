@@ -1,34 +1,33 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const connectDB = require("./config/db");
-const path = require("path");
+import axios from "axios";
 
-const app = express();
-connectDB();
+const api = axios.create({
+  baseURL: "https://articlehub-acmt.onrender.com/api"
+});
 
-app.use(cors());
-app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+api.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
 
-// Routes
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/posts", require("./routes/postRoutes"));
-app.use("/api/comments", require("./routes/commentRoutes"));
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
 
-// Serve static client files - handle both local and Vercel deployments
-const isDev = process.env.NODE_ENV !== "production";
-const clientPath = isDev 
-  ? path.join(__dirname, "../client/dist")
-  : path.join(__dirname, "../client/dist");
-  
-if (require("fs").existsSync(clientPath)) {
-  app.use(express.static(clientPath));
-  // SPA fallback for all non-API routes
-  app.get("/*splat", (req, res) => {
-    res.sendFile(path.join(clientPath, "index.html"));
-  });
-}
+  return req;
+});
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (
+      err.response?.status === 401 &&
+      !err.config?.url?.includes("/auth/login")
+    ) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(err);
+  }
+);
+
+export default api;

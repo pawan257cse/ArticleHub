@@ -1,7 +1,10 @@
 import axios from "axios";
 
+const apiBaseUrl =
+  (import.meta.env.VITE_API_URL || "https://articlehub-acmt.onrender.com/api").replace(/\/$/, "");
+
 const api = axios.create({
-  baseURL: "https://articlehub-acmt.onrender.com"
+  baseURL: apiBaseUrl
 });
 
 api.interceptors.request.use((req) => {

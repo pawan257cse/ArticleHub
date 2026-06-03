@@ -15,6 +15,9 @@ export default function CreatePost() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const getErrorMessage = (error) =>
+    error.response?.data?.message || error.response?.data?.error || error.message || "Failed to save draft. Please try again.";
+
   const submitPost = async () => {
     const formData = new FormData();
     formData.append("title", title);
@@ -22,12 +25,17 @@ export default function CreatePost() {
     formData.append("category", category);
     if (image) formData.append("image", image);
 
-    await api.post("/posts", formData);
-    alert("Post saved as draft");
-    if (user) {
-      navigate(`/profile/${user.id}`);
-    } else {
-      navigate("/");
+    try {
+      await api.post("/posts", formData);
+      alert("Post saved as draft");
+      if (user) {
+        navigate(`/profile/${user.id}`);
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Save draft failed:", error);
+      alert(getErrorMessage(error));
     }
   };
 

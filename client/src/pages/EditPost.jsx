@@ -15,6 +15,9 @@ export default function EditPost() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const getErrorMessage = (error) =>
+    error.response?.data?.message || error.response?.data?.error || error.message || "Failed to update post. Please try again.";
+
   const handleImage = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -56,8 +59,13 @@ export default function EditPost() {
     formData.append("category", category);
     if (image) formData.append("image", image);
 
-    await api.put(`/posts/${id}`, formData);
-    navigate(`/post/${id}`);
+    try {
+      await api.put(`/posts/${id}`, formData);
+      navigate(`/post/${id}`);
+    } catch (error) {
+      console.error("Update post failed:", error);
+      alert(getErrorMessage(error));
+    }
   };
 
   return (
